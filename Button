@@ -1,0 +1,40 @@
+import java.awt.*;
+
+public class Button {
+    private boolean isPressed;
+
+    private int x;
+    private int y;
+
+    public int upDownLeftRight;
+
+    private Image image;
+
+    private int width;
+    private int height;
+    private boolean enlarged;
+    private DDRViewer window;
+    public Button(Image image, int x, int y, int width, int height, DDRViewer window) {
+        this.image = image;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.window = window;
+        enlarged = false;
+    }
+    public void draw(Graphics g) {
+        if (enlarged) {
+            g.drawImage(image, x - width/2, y - height/2, width*2, height*2, window);
+        }
+        else{
+            g.drawImage(image, x - width/2, y - height/2, width, height, window);
+        }
+    }
+    public void enlarge() {
+        enlarged = true;
+    }
+    public void shrink() {
+        enlarged = false;
+    }
+}
