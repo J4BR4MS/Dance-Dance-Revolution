@@ -1,0 +1,114 @@
+import java.awt.*;
+
+public class Score {
+    public int currentScore;
+    public int finalScore;
+    private int highScore;
+
+    private double point = 500;
+    private double multiplier = 1;
+    public int streak;
+    public int incorrectStreak;
+
+    private boolean alreadyPlayed;
+    private boolean alreadyPlayed2;
+    private DDRViewer window;
+
+    public Score(DDRViewer window){
+        this.window = window;
+        alreadyPlayed = false;
+        alreadyPlayed2 = false;
+        streak = 0;
+        incorrectStreak = 10;
+    }
+
+    public void addPoint(){
+        currentScore += point * multiplier;
+    }
+    public void subtractPoint(){
+        currentScore -= 500;
+    }
+
+    public void increaseSpeed(){
+        window.incSpeed();
+    }
+    public void increaseSpeedAgain(){
+        window.incSpeedAgain();
+    }
+
+    public void setFinalScore(){
+        currentScore = finalScore;
+    }
+
+    public void streak(boolean alive){
+        if(alive){
+            streak++;
+        }
+        else{
+            streak = 0;
+            incorrectStreak--;
+            if(incorrectStreak == 0){
+                //endgame
+                window.lostGame();
+            }
+        }
+    }
+    public void bonus(){
+        if(streak < 10){
+            multiplier = 1;
+        }
+        if(streak > 9 && streak < 20){
+            multiplier = 2;
+            increaseSpeed();
+        }
+        if(streak > 19){
+            multiplier = 5;
+            increaseSpeedAgain();
+        }
+    }
+
+    public void updateScore(){
+        window.repaint();
+    }
+
+    public void draw(Graphics g){
+        g.setColor(Color.LIGHT_GRAY);
+        g.drawString("\tSCORE:" + currentScore, 60, 155);
+        g.drawString("\tSTREAK:", 60, 195);
+        g.drawString("\tMISTAKES", 75, 215);
+
+        g.setColor(Color.GREEN);
+        g.drawString(streak + "", 115, 195);
+
+        g.setColor(Color.RED);
+        g.drawString( incorrectStreak + "", 60, 215);
+
+
+        if(multiplier == 2){
+            g.setColor(Color.GREEN);
+            g.drawString("\t2x BONUS!", 60, 135);
+            if(!alreadyPlayed){
+                window.playSound("Resources/bonus.wav", -5f);
+            }
+            alreadyPlayed = true;
+        }
+        else if(multiplier == 5){
+            g.setColor(Color.YELLOW);
+            g.drawString("\t5x BONUS!", 60, 135);
+            if(!alreadyPlayed2){
+//                window.playSound("Resources/bonus.wav", -5);
+                window.playSound("Resources/secondBonus.wav", 10f);
+            }
+            alreadyPlayed2 = true;
+        }
+    }
+
+    public int getFinal(){
+        return finalScore;
+    }
+
+    public int getCurrent(){
+        return currentScore;
+    }
+
+}
