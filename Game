@@ -1,0 +1,93 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Queue;
+import java.awt.*;
+
+public class Game implements ActionListener {
+    private int danceNum;
+    private Button[] arrows;
+    public String username;
+    public Queue<FallingNote> instructions;
+
+    public Score score;
+
+    private Timer clock;
+
+    private FallingNote current;
+    private int sleepTime = 110;
+
+    int streak = 0;
+
+    private DDRViewer window;
+
+    private FallingNote[] sequence;
+//    private FallingNote test;
+    private int highScore;
+
+    public Game(){
+        //TODO: NEED HELP
+        this.window = new DDRViewerDoubleBuffer(this);
+//        this.window = new DDRViewer(this);
+        sequence = new FallingNote[100];
+//        test = new FallingNote(0, window);
+        clock = new Timer(100, this);
+        score = new Score(window);
+    }
+
+    public Score getScoreObj(){
+        return score;
+    }
+    public void setHighScore(){
+        if(score.getFinal() > highScore){
+            highScore = score.getFinal();
+        }
+    }
+    public FallingNote[] getSequence(){
+        //should iterate thru bc its giving viewer one at a time
+        return sequence;
+    }
+    //can't I just make the variable public?
+
+//    public FallingNote getNotes(){
+//        //should iterate thru bc its giving viewer one at a time
+//        return test;
+//    }
+
+    private void createSequence(){
+        for(int i = 0; i < sequence.length; i++){
+            sequence[i] = new FallingNote((int) (Math.random() * 4), 350*i, window);
+        }
+    }
+
+    public int getHighScore(){
+        return highScore;
+    }
+
+    public static void main(String[] args){
+        Game g = new Game();
+        g.createSequence();
+        g.run();
+    }
+//    private void passFrontNote(){
+//        if(window.getFrontNote().checkCollision()){
+//            window.changeFrontNote();
+//        }
+//    }
+    private void run(){
+        clock.start();
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        for(int i = 0; i < sequence.length; i++) {
+//            while (!sequence[i].checkCollision()) {
+                sequence[i].move();
+//                window.repaint();
+//            }
+        }
+//        sequence[0].move();
+        window.repaint();
+    }
+}
