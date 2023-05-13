@@ -30,7 +30,47 @@ public class Score {
         alreadyIncreasedSpeed2 = false;
     }
 
+    public void draw(Graphics g){
+        // Draw statistics
+        g.setColor(Color.LIGHT_GRAY);
+        g.drawString("\tSCORE:" + currentScore, 60, 155);
+        g.drawString("\tSTREAK:", 60, 195);
+        g.drawString("\tMISTAKES LEFT", 75, 215);
+
+        // Make the actual statistics a different color
+        // Streak is in green
+        g.setColor(Color.GREEN);
+        g.drawString(streak + "", 115, 195);
+
+        // Mistakes left is in red
+        g.setColor(Color.RED);
+        g.drawString( incorrectStreak + "", 60, 215);
+
+        // If a certain multiplier exists, illustrate a colorful bonus for the user to see
+        if(multiplier == MULTIPLIER1){
+            g.setColor(Color.GREEN);
+            g.drawString("\t2x BONUS!", 60, 135);
+
+            // Make sure this only happens once, since this method is called repeatedly
+            if(!alreadyPlayed){
+                window.getGame().playSound("Resources/bonus.wav");
+                alreadyPlayed = true;
+            }
+        }
+        // Same but for a greater multiplier
+        else if(multiplier == MULTIPLIER2){
+            g.setColor(Color.YELLOW);
+            g.drawString("\t5x BONUS!", 60, 135);
+            if(!alreadyPlayed2){
+                window.getGame().playSound("Resources/secondBonus.wav");
+                alreadyPlayed2 = true;
+            }
+        }
+    }
+
+
     public void addPoint(){
+        // Add a point influenced by the bonus multiplier
         currentScore += POINT * multiplier;
     }
     public void subtractPoint(){
@@ -38,22 +78,28 @@ public class Score {
     }
 
     public void streak(boolean alive){
+        // If the streak is alive, add to the streak variable
         if(alive){
             streak++;
         }
+        // Reset the streak, increase the mistakes
         else{
             streak = 0;
             incorrectStreak--;
+            // If there are enough mistakes, end the game
             if(incorrectStreak == 0){
-                //end game
                 window.lostGameScreen();
             }
+            subtractPoint();
         }
     }
     public void bonus(){
+        // If the streak is too small, make sure the multiplier is 1, as the point will be influenced by it.
+        // This means the multiplier cannot be 0 or else there will be no points added.
         if(streak < STREAK_CHECKPOINT_1){
             multiplier = 1;
         }
+        // If the streak is large enough to qualify for the first bonus, increase the multiplier and speed
         if(streak >= STREAK_CHECKPOINT_1 && streak < STREAK_CHECKPOINT_2){
             multiplier = MULTIPLIER1;
             if(!alreadyIncreasedSpeed) {
@@ -61,6 +107,7 @@ public class Score {
                 alreadyIncreasedSpeed = true;
             }
         }
+        // Same but for the second bonus
         if(streak >= STREAK_CHECKPOINT_2){
             multiplier = MULTIPLIER2;
             if(!alreadyIncreasedSpeed2){
@@ -73,36 +120,4 @@ public class Score {
     public void updateScore(){
         window.repaint();
     }
-
-    public void draw(Graphics g){
-        g.setColor(Color.LIGHT_GRAY);
-        g.drawString("\tSCORE:" + currentScore, 60, 155);
-        g.drawString("\tSTREAK:", 60, 195);
-        g.drawString("\tMISTAKES", 75, 215);
-
-        g.setColor(Color.GREEN);
-        g.drawString(streak + "", 115, 195);
-
-        g.setColor(Color.RED);
-        g.drawString( incorrectStreak + "", 60, 215);
-
-
-        if(multiplier == MULTIPLIER1){
-            g.setColor(Color.GREEN);
-            g.drawString("\t2x BONUS!", 60, 135);
-            if(!alreadyPlayed){
-                window.getGame().playSound("Resources/bonus.wav");
-            }
-            alreadyPlayed = true;
-        }
-        else if(multiplier == MULTIPLIER1){
-            g.setColor(Color.YELLOW);
-            g.drawString("\t5x BONUS!", 60, 135);
-            if(!alreadyPlayed2){
-                window.getGame().playSound("Resources/secondBonus.wav");
-            }
-            alreadyPlayed2 = true;
-        }
-    }
-
 }
