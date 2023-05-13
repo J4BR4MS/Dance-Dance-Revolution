@@ -1,42 +1,36 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
-import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.*;
-import java.io.*;
+
 
 public class DDRViewer extends JFrame implements KeyListener {
-    private final int WINDOW_WIDTH = 1000;
-    private final int WINDOW_HEIGHT = 1000;
+    final private int WINDOW_WIDTH = 1000;
+    final private int WINDOW_HEIGHT = 1000;
+    final private int buttonY = WINDOW_HEIGHT - 161;
 
-    private Game game;
-    private Button up;
-    private Button down;
-    private Button right;
-    private Button left;
-    private Image background;
-    private FallingNote currentNote;
+    final private Game game;
     private FallingNote frontNote;
+
+    final private Button up;
+    final private Button down;
+    final private Button right;
+    final private Button left;
+
+    final private Image background;
+    final private Image explosion;
+
     private int frontNoteNumber;
-    private boolean drawExplosion;
-    private Image explosion;
+    private int drawExplosion;
     private int frontNoteFinalY;
     private int frontNoteX;
 
 
-
-    public int buttonY = WINDOW_HEIGHT - 161;
-//    public int buttonWidth;
-
-//    FallingNote test;
-
     public DDRViewer(Game game) {
         this.game = game;
+        drawExplosion = 3;
+        frontNoteNumber = 0;
+
 
         setTitle("Dance Dance Revolution");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,21 +64,22 @@ public class DDRViewer extends JFrame implements KeyListener {
         ImageIcon explosionIcon = new ImageIcon("Resources/explosion.png");
         explosion = explosionIcon.getImage();
 
-        //1126x1126
-        //161x112.6
+
         // Add key listener and set visibility
-        drawExplosion = false;
-        frontNoteNumber = 0;
         addKeyListener(this);
         setVisible(true);
     }
 
     @Override
+    public void keyReleased(KeyEvent e) {}
+    @Override
+    public void keyTyped(KeyEvent e) {}
+    @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
         frontNote = game.getSequence()[frontNoteNumber];
-        if (keyCode == KeyEvent.VK_UP) {
-            if(frontNote.inFieldOfPlay() && frontNote.direction == 0){
+        if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) {
+            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 0){
                 game.getScoreObj().streak(true);
                 correctChoice(frontNote);
             }
@@ -92,155 +87,37 @@ public class DDRViewer extends JFrame implements KeyListener {
                 game.getScoreObj().streak(false);
             }
         }
-                if(keyCode == KeyEvent.VK_DOWN) {
-                    if(frontNote.inFieldOfPlay() && frontNote.direction == 1){
-                        game.getScoreObj().streak(true);
-                        correctChoice(frontNote);
-                    }
-                    else{
-                        game.getScoreObj().streak(false);
-                    }
-                }
-
-                if(keyCode == KeyEvent.VK_RIGHT) {
-                    if(frontNote.inFieldOfPlay() && frontNote.direction == 2){
-                        game.getScoreObj().streak(true);
-                        correctChoice(frontNote);
-                    }
-                    else{
-                        game.getScoreObj().streak(false);
-                    }
-                }
-
-                if(keyCode == KeyEvent.VK_LEFT) {
-                    if(frontNote.inFieldOfPlay() && frontNote.direction == 3){
-                        game.getScoreObj().streak(true);
-                        correctChoice(frontNote);
-                    }
-                    else{
-                        game.getScoreObj().streak(false);
-                    }
-                }
-    }
-
-    //                        else{
-//                            game.getScoreObj().streak(false);
-//                        }
-
-    //                        else{
-//                            game.getScoreObj().streak(false);
-//                        }
-//                    }
-
-//        int i = 0;
-//        while (!game.getSequence()[i].inFieldOfPlay() && game.getSequence()[i].direction != 0) {
-//            i++;
-//        }
-//        correctChoice(i);
-
-
-
-            //    int keyCode = e.getKeyCode();
-            //
-            //        if(keyCode == KeyEvent.VK_UP)
-            //    {
-            //        //Enlarge arrow
-            //        up.enlarge();
-            //        repaint();
-            //        //Wait for a second
-            //
-            //        // Shrink arrow image back
-            ////            up.shrink();
-            ////            repaint();
-            //    }
-            ////        else if(keyCode == KeyEvent.VK_DOWN)
-            ////        {
-            ////            // Code for down arrow
-            ////        }
-            ////        else if(keyCode == KeyEvent.VK_LEFT)
-            ////        {
-            ////            // Code for left arrow
-            ////        }
-            ////        else if(keyCode == KeyEvent.VK_RIGHT)
-            ////        {
-            ////            // Code for right arrow
-            ////        }
-
-    public void correctChoice(FallingNote frontNote){
-        game.getScoreObj().addPoint();
-        game.getScoreObj().bonus();
-        game.getScoreObj().updateScore();
-        frontNoteFinalY = frontNote.getY();
-        frontNoteX = frontNote.getX();
-        frontNote.scored();
-        drawExplosion = true;
-        frontNoteNumber++;
-//        frontNote = game.getSequence()[frontNoteNumber];
-    }
-
-    public void playSound(String soundFile, float volIncrease){
-        try {
-            File file = new File(soundFile);
-            AudioInputStream stream;
-            AudioFormat format;
-            DataLine.Info info;
-            Clip clip;
-            stream = AudioSystem.getAudioInputStream(file);
-            format = stream.getFormat();
-            info = new DataLine.Info(Clip.class, format);
-            clip = (Clip) AudioSystem.getLine(info);
-            clip.open(stream);
-            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue(gainControl.getValue() + volIncrease);
-            clip.start();
-        }
-        catch (Exception e){
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
-    @Override
-    public void keyTyped(KeyEvent e) {}
-    // && game.getSequence()[i].direction = 0
-
-//    public FallingNote getFrontNote(){
-//        return frontNote;
-//    }
-    public void changeFrontNote(FallingNote isFrontNote){
-        if(frontNote == isFrontNote){
-            frontNoteNumber++;
-            getScore().streak(false);
-            if(frontNoteNumber == game.getSequence().length){
-                game.getScoreObj().setFinalScore();
+        if(keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_S) {
+            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 1){
+                game.getScoreObj().streak(true);
+                correctChoice(frontNote);
             }
-            frontNote = game.getSequence()[frontNoteNumber];
-            game.getScoreObj().subtractPoint();
+            else{
+                game.getScoreObj().streak(false);
+            }
+        }
+
+        if(keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D) {
+            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 2){
+                game.getScoreObj().streak(true);
+                correctChoice(frontNote);
+            }
+            else{
+                game.getScoreObj().streak(false);
+            }
+        }
+
+        if(keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_A) {
+            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 3){
+                game.getScoreObj().streak(true);
+                correctChoice(frontNote);
+            }
+            else{
+                game.getScoreObj().streak(false);
+            }
         }
     }
 
-    public void incSpeed(){
-        for(int i = 0; i < game.getSequence().length; i++){
-            game.getSequence()[i].increaseDY();
-        }
-    }
-
-    public void incSpeedAgain(){
-        for(int i = 0; i < game.getSequence().length; i++){
-            game.getSequence()[i].increaseDYagain();
-        }
-    }
-
-    public void lostGame(){
-        //how to get new one
-        setTitle("You lost.");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(0, 0);
-    }
-
-    public Score getScore(){
-        return game.getScoreObj();
-    }
     public void paint(Graphics g) {
 
 //        g.setColor(Color.DARK_GRAY);
@@ -257,18 +134,17 @@ public class DDRViewer extends JFrame implements KeyListener {
         // The rectangle must begin at 227 (plus change for visual appeal), which is the length of 2 button images.
         g.fillRect(50, 100, 150, 150);
         //make border as well
-        g.setColor(Color.LIGHT_GRAY);
-        g.drawString("\tHIGH SCORE:" + game.getHighScore(), 60, 175);
+
 
 //      Draw arrows
         for(int i = 0; i < game.getSequence().length; i++) {
             game.getSequence()[i].draw(g);
         }
 
-        if(drawExplosion){
+        if(drawExplosion > 0){
             g.drawImage(explosion, frontNoteX, frontNoteFinalY, 50, 50, this);
         }
-        drawExplosion = false;
+        drawExplosion--;
 //        game.getNotes()[0].draw(g);
         game.getScoreObj().draw(g);
         up.draw(g);
@@ -276,4 +152,51 @@ public class DDRViewer extends JFrame implements KeyListener {
         right.draw(g);
         left.draw(g);
     }
+
+    public void correctChoice(FallingNote frontNote){
+        game.getScoreObj().addPoint();
+        game.getScoreObj().bonus();
+        game.getScoreObj().updateScore();
+        frontNoteFinalY = frontNote.getY();
+        frontNoteX = frontNote.getX();
+        frontNote.scored();
+        drawExplosion = 3;
+        frontNoteNumber++;
+    }
+
+    public void incSpeed(int streak){
+        for(int i = 0; i < game.getSequence().length; i++){
+            game.getSequence()[i].increaseDY(streak);
+        }
+    }
+
+    public int getButtonY(){
+        return buttonY;
+    }
+
+    public Game getGame(){
+        return game;
+    }
+
+    public FallingNote getFrontNote(){
+        return frontNote;
+    }
+    public void setFrontNote(FallingNote newFrontNote){
+        frontNote = newFrontNote;
+    }
+
+    public int getFrontNoteNumber(){
+        return frontNoteNumber;
+    }
+    public void increaseFrontNoteNumber(){
+        frontNoteNumber++;
+    }
+
+    public void lostGameScreen(){
+        //how to get new one
+        setTitle("You lost.");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(0, 0);
+    }
+
 }
