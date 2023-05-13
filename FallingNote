@@ -17,8 +17,6 @@ public class FallingNote {
 
     final private int direction;
 
-    private boolean timesUp = false;
-
     public FallingNote(int direction, int y, DDRViewer window){
         this.direction = direction;
         setDirection(direction);
@@ -27,30 +25,39 @@ public class FallingNote {
     }
 
     public void setDirection(int direction){
+        // Create the image and location of each falling note depending on its direction
+
+        // If this is an up note
         if(direction == 0){
-            //112 (width of button) - 25 (half width of note)
+            // 25 (half width of note) - 112 (width of button)
             x = WINDOW_WIDTH/2 - 87;
             ImageIcon upNote = new ImageIcon("Resources/upNote.png");
             image = upNote.getImage();
         }
+        // If this is a down note
         if(direction == 1){
+            // 25 (half width of note)
             x = WINDOW_WIDTH/2 + 25;
             ImageIcon downNote = new ImageIcon("Resources/downNote.png");
             image = downNote.getImage();
         }
+        // If this is a right note
         if(direction == 2){
+            // // 112 (width of button) + 25 (half width of note)
             x = WINDOW_WIDTH/2 + 137;
             ImageIcon rightNote = new ImageIcon("Resources/rightNote.png");
             image = rightNote.getImage();
         }
+        // If this is a left note
         if(direction == 3){
-            //195 Is the width of 1.5 Buttons plus the 1/2 the width, so it spawns in the middle.
+            // 112 (width of button) + 61 (half the width of button) + 25 (half width of note)
             x = WINDOW_WIDTH/2 - 195;
             ImageIcon leftNote = new ImageIcon("Resources/leftNote.png");
             image  = leftNote.getImage();
         }
     }
     public void move() {
+        // If the note has not collided with the button, or reached the limit of when the user can press it
         if(!checkCollision()){
             y = y + dy;
         }
@@ -61,28 +68,22 @@ public class FallingNote {
     }
 
     public void scored(){
+        // If the note is conquered, send it way out yonder
         y = -100000;
+        // Play the rewarding point sound
         window.getGame().playSound("Resources/point.wav");
     }
 
     public boolean checkCollision() {
+        // If the note is within the range of a button
         for(int i = 0; i < 40; i++) {
             if (y == window.getButtonY() - width + i) {
-                timesUp = true;
+                // This note has failed to be conquered, so change the front note
                 window.getGame().changeFrontNote(this);
                 return true;
             }
         }
             return false;
-        }
-
-    public boolean inFieldOfPlay(){
-        if(y > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
     }
 
     public int getX(){
@@ -97,7 +98,7 @@ public class FallingNote {
     }
 
     public void increaseDY(int streak){
+        // Increase the speed once the streak reaches a multiple of 10
         dy += 10 * (int) (streak / 10);
     }
 }
-
