@@ -1,21 +1,9 @@
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-/******************************************************************************************
- *
- * Program:	ManyBallsViewDoubleBuffered
- * Created by: Z. Blickensderfer, 12/30/22
- *
- * Description:
- * This extends the front-end class ManyBallsView. It adds a buffer strategy,
- * which creates two separate Graphics objects running on separate threads:
- * while one is displayed, the other is being painted. Then, they swap places.
- * This multi-threading creates an animation that appears smoother.
- *
- *****************************************************************************************/
 
 public class DDRViewerDoubleBuffer extends DDRViewer{
-    // TODO: modify this constructor to accept an array of Balls, not just one Ball.
     public DDRViewerDoubleBuffer(Game game) {
+        // This is me understanding how to access public information from the super class.
         super(game);
         createBufferStrategy(2);
     }
