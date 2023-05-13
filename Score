@@ -1,18 +1,24 @@
 import java.awt.*;
 
 public class Score {
-    public int currentScore;
-    public int finalScore;
-    private int highScore;
 
-    private double point = 500;
+    final private DDRViewer window;
+
+    final private double POINT = 500;
+    final private int STREAK_CHECKPOINT_1 = 10;
+    final private int STREAK_CHECKPOINT_2 = 20;
+    final private int MULTIPLIER1 = 2;
+    final private int MULTIPLIER2 = 5;
+
+    private int currentScore;
     private double multiplier = 1;
-    public int streak;
-    public int incorrectStreak;
+    private int streak;
+    private int incorrectStreak;
 
     private boolean alreadyPlayed;
     private boolean alreadyPlayed2;
-    private DDRViewer window;
+    private boolean alreadyIncreasedSpeed;
+    private boolean alreadyIncreasedSpeed2;
 
     public Score(DDRViewer window){
         this.window = window;
@@ -20,24 +26,15 @@ public class Score {
         alreadyPlayed2 = false;
         streak = 0;
         incorrectStreak = 10;
+        alreadyIncreasedSpeed = false;
+        alreadyIncreasedSpeed2 = false;
     }
 
     public void addPoint(){
-        currentScore += point * multiplier;
+        currentScore += POINT * multiplier;
     }
     public void subtractPoint(){
         currentScore -= 500;
-    }
-
-    public void increaseSpeed(){
-        window.incSpeed();
-    }
-    public void increaseSpeedAgain(){
-        window.incSpeedAgain();
-    }
-
-    public void setFinalScore(){
-        currentScore = finalScore;
     }
 
     public void streak(boolean alive){
@@ -48,22 +45,28 @@ public class Score {
             streak = 0;
             incorrectStreak--;
             if(incorrectStreak == 0){
-                //endgame
-                window.lostGame();
+                //end game
+                window.lostGameScreen();
             }
         }
     }
     public void bonus(){
-        if(streak < 10){
+        if(streak < STREAK_CHECKPOINT_1){
             multiplier = 1;
         }
-        if(streak > 9 && streak < 20){
-            multiplier = 2;
-            increaseSpeed();
+        if(streak >= STREAK_CHECKPOINT_1 && streak < STREAK_CHECKPOINT_2){
+            multiplier = MULTIPLIER1;
+            if(!alreadyIncreasedSpeed) {
+                window.incSpeed(streak);
+                alreadyIncreasedSpeed = true;
+            }
         }
-        if(streak > 19){
-            multiplier = 5;
-            increaseSpeedAgain();
+        if(streak >= STREAK_CHECKPOINT_2){
+            multiplier = MULTIPLIER2;
+            if(!alreadyIncreasedSpeed2){
+                window.incSpeed(streak);
+                alreadyIncreasedSpeed2 = true;
+            }
         }
     }
 
@@ -84,31 +87,22 @@ public class Score {
         g.drawString( incorrectStreak + "", 60, 215);
 
 
-        if(multiplier == 2){
+        if(multiplier == MULTIPLIER1){
             g.setColor(Color.GREEN);
             g.drawString("\t2x BONUS!", 60, 135);
             if(!alreadyPlayed){
-                window.playSound("Resources/bonus.wav", -5f);
+                window.getGame().playSound("Resources/bonus.wav");
             }
             alreadyPlayed = true;
         }
-        else if(multiplier == 5){
+        else if(multiplier == MULTIPLIER1){
             g.setColor(Color.YELLOW);
             g.drawString("\t5x BONUS!", 60, 135);
             if(!alreadyPlayed2){
-//                window.playSound("Resources/bonus.wav", -5);
-                window.playSound("Resources/secondBonus.wav", 10f);
+                window.getGame().playSound("Resources/secondBonus.wav");
             }
             alreadyPlayed2 = true;
         }
-    }
-
-    public int getFinal(){
-        return finalScore;
-    }
-
-    public int getCurrent(){
-        return currentScore;
     }
 
 }
