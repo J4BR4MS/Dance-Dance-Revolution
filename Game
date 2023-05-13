@@ -35,6 +35,7 @@ public class Game implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // Move every note in the array and refresh
         for(int i = 0; i < sequence.length; i++) {
                 sequence[i].move();
         }
@@ -42,6 +43,7 @@ public class Game implements ActionListener {
     }
 
     public void playSound(String soundFile){
+        // Plays inputted sound –– research was needed here
         try {
             File file = new File(soundFile);
             AudioInputStream stream;
@@ -53,6 +55,8 @@ public class Game implements ActionListener {
             info = new DataLine.Info(Clip.class, format);
             clip = (Clip) AudioSystem.getLine(info);
             clip.open(stream);
+            // The following did not work. I tried to also add a parameter that lets you increase the volume
+            // of the given clip, but that went wrong.
 //            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 //            gainControl.setValue(gainControl.getValue() + volIncrease);
             clip.start();
@@ -62,11 +66,10 @@ public class Game implements ActionListener {
     }
 
     public void changeFrontNote(FallingNote isFrontNote){
+        // Upon conquering the front note, change it to allow the user to click the next closest note
         if(window.getFrontNote() == isFrontNote){
             window.increaseFrontNoteNumber();
-            score.streak(false);
             window.setFrontNote(sequence[window.getFrontNoteNumber()]);
-            score.subtractPoint();
         }
     }
 
@@ -78,6 +81,7 @@ public class Game implements ActionListener {
         return sequence;
     }
     private void createSequence(){
+        // Create the array of falling notes
         for(int i = 0; i < sequence.length; i++){
             sequence[i] = new FallingNote((int) (Math.random() * 4), 350*i, window);
         }
