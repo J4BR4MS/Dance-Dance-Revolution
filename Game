@@ -1,93 +1,89 @@
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Queue;
-import java.awt.*;
+import java.io.File;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
 
 public class Game implements ActionListener {
-    private int danceNum;
-    private Button[] arrows;
-    public String username;
-    public Queue<FallingNote> instructions;
+    final private int SLEEP_TIME = 100;
+    final private int GAME_LENGTH = 50;
 
-    public Score score;
-
-    private Timer clock;
-
-    private FallingNote current;
-    private int sleepTime = 110;
-
-    int streak = 0;
-
-    private DDRViewer window;
-
-    private FallingNote[] sequence;
-//    private FallingNote test;
-    private int highScore;
+    final private Score score;
+    final private Timer clock;
+    final private DDRViewer window;
+    final private FallingNote[] sequence;
 
     public Game(){
-        //TODO: NEED HELP
         this.window = new DDRViewerDoubleBuffer(this);
-//        this.window = new DDRViewer(this);
-        sequence = new FallingNote[100];
-//        test = new FallingNote(0, window);
-        clock = new Timer(100, this);
+        sequence = new FallingNote[GAME_LENGTH];
+        clock = new Timer(SLEEP_TIME, this);
         score = new Score(window);
-    }
-
-    public Score getScoreObj(){
-        return score;
-    }
-    public void setHighScore(){
-        if(score.getFinal() > highScore){
-            highScore = score.getFinal();
-        }
-    }
-    public FallingNote[] getSequence(){
-        //should iterate thru bc its giving viewer one at a time
-        return sequence;
-    }
-    //can't I just make the variable public?
-
-//    public FallingNote getNotes(){
-//        //should iterate thru bc its giving viewer one at a time
-//        return test;
-//    }
-
-    private void createSequence(){
-        for(int i = 0; i < sequence.length; i++){
-            sequence[i] = new FallingNote((int) (Math.random() * 4), 350*i, window);
-        }
-    }
-
-    public int getHighScore(){
-        return highScore;
     }
 
     public static void main(String[] args){
         Game g = new Game();
         g.createSequence();
+        g.playSound("Resources/backgroundMusic.wav");
         g.run();
     }
-//    private void passFrontNote(){
-//        if(window.getFrontNote().checkCollision()){
-//            window.changeFrontNote();
-//        }
-//    }
     private void run(){
         clock.start();
     }
 
-
     @Override
     public void actionPerformed(ActionEvent e) {
         for(int i = 0; i < sequence.length; i++) {
-//            while (!sequence[i].checkCollision()) {
                 sequence[i].move();
-//                window.repaint();
-//            }
         }
-//        sequence[0].move();
         window.repaint();
     }
+
+    public void playSound(String soundFile){
+        try {
+            File file = new File(soundFile);
+            AudioInputStream stream;
+            AudioFormat format;
+            DataLine.Info info;
+            Clip clip;
+            stream = AudioSystem.getAudioInputStream(file);
+            format = stream.getFormat();
+            info = new DataLine.Info(Clip.class, format);
+            clip = (Clip) AudioSystem.getLine(info);
+            clip.open(stream);
+//            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+//            gainControl.setValue(gainControl.getValue() + volIncrease);
+            clip.start();
+        }
+        catch (Exception e){
+        }
+    }
+
+    public void changeFrontNote(FallingNote isFrontNote){
+        if(window.getFrontNote() == isFrontNote){
+            window.increaseFrontNoteNumber();
+            score.streak(false);
+            window.setFrontNote(sequence[window.getFrontNoteNumber()]);
+            score.subtractPoint();
+        }
+    }
+
+    public Score getScoreObj(){
+        return score;
+    }
+
+    public FallingNote[] getSequence(){
+        return sequence;
+    }
+    private void createSequence(){
+        // This is me showing I can do a for each loop.
+        int i = 0;
+        for(FallingNote note : sequence){
+            note = new FallingNote((int) (Math.random() * 4), 350*i, window);
+            i++;
+        }
+    }
+
 }
