@@ -31,7 +31,7 @@ public class DDRViewer extends JFrame implements KeyListener {
         drawExplosion = 3;
         frontNoteNumber = 0;
 
-
+        // Create the window
         setTitle("Dance Dance Revolution");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -41,7 +41,6 @@ public class DDRViewer extends JFrame implements KeyListener {
         ImageIcon upIcon = new ImageIcon("Resources/upArrowButton.png");
         Image upImage = upIcon.getImage(); //is this line necessary? Why do I need a variable for this? Below I can just use this code instead of a variable.
         up = new Button(upImage, WINDOW_WIDTH / 2 - 57, buttonY, upIcon.getIconWidth() / 10, upIcon.getIconHeight() / 10, this);
-//        buttonWidth = upIcon.getIconWidth()/10;
 
         // Create the down arrow
         ImageIcon downIcon = new ImageIcon("Resources/downArrowButton.png");
@@ -58,9 +57,11 @@ public class DDRViewer extends JFrame implements KeyListener {
         Image leftImage = leftIcon.getImage();
         left = new Button(leftImage, WINDOW_WIDTH / 2 - 170, buttonY, leftIcon.getIconWidth() / 10, leftIcon.getIconHeight() / 10, this);
 
+        // Create the background of the main stage
         ImageIcon backgroundIcon = new ImageIcon("Resources/Background.png");
         background = backgroundIcon.getImage();
 
+        // Create the explosion image that will be used when a falling note is conquered
         ImageIcon explosionIcon = new ImageIcon("Resources/explosion.png");
         explosion = explosionIcon.getImage();
 
@@ -77,42 +78,58 @@ public class DDRViewer extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
+
+        // The note being looked at to see if it's pressed.
         frontNote = game.getSequence()[frontNoteNumber];
+
+        // If the user presses the up arrow or "W" key
         if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_W) {
-            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 0){
-                game.getScoreObj().streak(true);
-                correctChoice(frontNote);
+            // If the front note is an up note
+            if(frontNote.getDirection() == 0){
+                // The user correctly addressed the front note, so call the correctChoice method
+                correctChoice();
             }
             else{
+                // The user incorrect addressed the front note, so break the streak
                 game.getScoreObj().streak(false);
             }
         }
+
+        // If the user presses the down arrow or "S" key
         if(keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_S) {
-            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 1){
-                game.getScoreObj().streak(true);
-                correctChoice(frontNote);
+            // If the front note is a down note
+            if(frontNote.getDirection() == 1){
+                // The user correctly addressed the front note, so call the correctChoice method
+                correctChoice();
             }
             else{
+                // The user incorrect addressed the front note, so break the streak
                 game.getScoreObj().streak(false);
             }
         }
 
+        // If the user presses the right arrow or "D" key
         if(keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_D) {
-            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 2){
-                game.getScoreObj().streak(true);
-                correctChoice(frontNote);
+            // If the front note is a right note
+            if(frontNote.getDirection() == 2){
+                // The user correctly addressed the front note, so call the correctChoice method
+                correctChoice();
             }
             else{
+                // The user incorrect addressed the front note, so break the streak
                 game.getScoreObj().streak(false);
             }
         }
 
+        // If the user presses the left arrow or "A" key
         if(keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_A) {
-            if(frontNote.inFieldOfPlay() && frontNote.getDirection() == 3){
-                game.getScoreObj().streak(true);
-                correctChoice(frontNote);
+            // If the front note is a left note
+            if(frontNote.getDirection() == 3){
+                // The user correctly addressed the front note, so call the correctChoice method
+                correctChoice();
             }
             else{
+                // The user incorrect addressed the front note, so break the streak
                 game.getScoreObj().streak(false);
             }
         }
@@ -120,32 +137,27 @@ public class DDRViewer extends JFrame implements KeyListener {
 
     public void paint(Graphics g) {
 
-//        g.setColor(Color.DARK_GRAY);
-//        // The rectangle must begin at 227 (plus change for visual appeal), which is the length of 2 button images.
-//        g.fillRect(WINDOW_WIDTH/2 - 250, 0, 500, 1000);
+        // Create a dark green background
         Color darkGreen = new Color(14, 104, 41);
         g.setColor(darkGreen);
-        // The rectangle must begin at 227 (plus change for visual appeal), which is the length of 2 button images.
         g.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         g.drawImage(background, WINDOW_WIDTH/2 - 250, 0, 500, 1000, this);
 
-        //create scoreboard
+        // Create scoreboard
         g.setColor(Color.DARK_GRAY);
-        // The rectangle must begin at 227 (plus change for visual appeal), which is the length of 2 button images.
         g.fillRect(50, 100, 150, 150);
-        //make border as well
 
-
-//      Draw arrows
-        for(int i = 0; i < game.getSequence().length; i++) {
-            game.getSequence()[i].draw(g);
+        // This is me proving I know how to use a for each loop
+        for(FallingNote note : game.getSequence()){
+            note.draw(g);
         }
 
+        // Draw the explosion for 3 frames after the conquered note vanishes
         if(drawExplosion > 0){
             g.drawImage(explosion, frontNoteX, frontNoteFinalY, 50, 50, this);
         }
         drawExplosion--;
-//        game.getNotes()[0].draw(g);
+
         game.getScoreObj().draw(g);
         up.draw(g);
         down.draw(g);
@@ -153,20 +165,32 @@ public class DDRViewer extends JFrame implements KeyListener {
         left.draw(g);
     }
 
-    public void correctChoice(FallingNote frontNote){
+    public void correctChoice(){
+        // Add to the streak
+        game.getScoreObj().streak(true);
+
+        // Update the score
         game.getScoreObj().addPoint();
         game.getScoreObj().bonus();
         game.getScoreObj().updateScore();
+
+        // Get final coordinates of the front note so explosion can be animated in the correct spot
         frontNoteFinalY = frontNote.getY();
         frontNoteX = frontNote.getX();
+
+        // Vanish the conquered note
         frontNote.scored();
+
+        // Give the "ok" to draw the explosion
         drawExplosion = 3;
         frontNoteNumber++;
     }
 
     public void incSpeed(int streak){
-        for(int i = 0; i < game.getSequence().length; i++){
-            game.getSequence()[i].increaseDY(streak);
+        // This is me again proving I know how to use a for each loop
+        // This increases the speed of every single note if the streak is large enough
+        for(FallingNote note : game.getSequence()){
+            note.increaseDY(streak);
         }
     }
 
@@ -193,10 +217,10 @@ public class DDRViewer extends JFrame implements KeyListener {
     }
 
     public void lostGameScreen(){
-        //how to get new one
-        setTitle("You lost.");
+        // Make the window smaller so the user only sees the new title
+        setTitle("You lost. You mustn't make fewer than 10 mistakes.");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(0, 0);
+        setSize(400, 0);
     }
 
 }
