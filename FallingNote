@@ -3,21 +3,21 @@ import java.awt.*;
 
 public class FallingNote {
 
+    final private int WINDOW_WIDTH = 1000;
+
+    final private DDRViewer window;
     private Image image;
-    private DDRViewer window;
-    private int speed;
+
     private int x;
     private int y = 0;
     private int dy = 20;
-    private int height = 50;
-    private int width = 50;
-    public int direction;
 
-    public boolean timesUp = false;
-    //Is this ok? (down)
-    private final int WINDOW_WIDTH = 1000;
-    private final int WINDOW_HEIGHT = 1000;
+    final private int height = 50;
+    final private int width = 50;
 
+    final private int direction;
+
+    private boolean timesUp = false;
 
     public FallingNote(int direction, int y, DDRViewer window){
         this.direction = direction;
@@ -30,10 +30,6 @@ public class FallingNote {
         if(direction == 0){
             //112 (width of button) - 25 (half width of note)
             x = WINDOW_WIDTH/2 - 87;
-//            ImageIcon leftNoteIcon = new ImageIcon("Resources/leftNote.png");
-//            Image leftNoteImage = leftNoteIcon.getImage();
-//            Falling Note left = new Falling Note(leftNoteImage, x, y, rightIcon.getIconWidth()/10, rightIcon.getIconHeight()/10, this);
-//            This should be in viewer
             ImageIcon upNote = new ImageIcon("Resources/upNote.png");
             image = upNote.getImage();
         }
@@ -48,16 +44,11 @@ public class FallingNote {
             image = rightNote.getImage();
         }
         if(direction == 3){
-            //220 Is the width of 1.5 Buttons plus the width, so it spawns in the middle
+            //195 Is the width of 1.5 Buttons plus the 1/2 the width, so it spawns in the middle.
             x = WINDOW_WIDTH/2 - 195;
-//          why doesn't             x = WINDOW_WIDTH/2 - (window.buttonWidth); work
             ImageIcon leftNote = new ImageIcon("Resources/leftNote.png");
             image  = leftNote.getImage();
         }
-    }
-
-    public void changeVelocity(int increaseBy){
-        dy += increaseBy;
     }
     public void move() {
         if(!checkCollision()){
@@ -65,35 +56,20 @@ public class FallingNote {
         }
     }
 
-    public void scored(){
-        y = -100000;
-        window.playSound("Resources/point.wav", 0f);
-        //stop the action performed/move
-    }
     public void draw(Graphics g){
         g.drawImage(image, x, y, width, height, window);
     }
-    public void increaseDY(){
-        dy = 40;
-    }
 
-    public int getX(){
-        return x;
-    }
-
-    public int getY(){
-        return y;
-    }
-
-    public void increaseDYagain(){
-        dy = 50;
+    public void scored(){
+        y = -100000;
+        window.getGame().playSound("Resources/point.wav");
     }
 
     public boolean checkCollision() {
         for(int i = 0; i < 40; i++) {
-            if (y == window.buttonY - width + i) {
+            if (y == window.getButtonY() - width + i) {
                 timesUp = true;
-                window.changeFrontNote(this);
+                window.getGame().changeFrontNote(this);
                 return true;
             }
         }
@@ -108,10 +84,20 @@ public class FallingNote {
             return false;
         }
     }
+
+    public int getX(){
+        return x;
+    }
+    public int getY(){
+        return y;
+    }
+
+    public int getDirection(){
+        return direction;
+    }
+
+    public void increaseDY(int streak){
+        dy += 10 * (int) (streak / 10);
+    }
 }
-
-
-    //if score = x amt, speed increase
-    //if pressed correct, update streak and submit to score.bonus() each time
-    //but idk where this method should be maybe in viewer
 
