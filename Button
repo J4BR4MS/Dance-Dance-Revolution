@@ -1,19 +1,16 @@
 import java.awt.*;
 
 public class Button {
-    private boolean isPressed;
+    final private int x;
+    final private int y;
 
-    private int x;
-    private int y;
+    final private Image image;
 
-    public int upDownLeftRight;
+    final private int width;
+    final private int height;
 
-    private Image image;
+    final private DDRViewer window;
 
-    private int width;
-    private int height;
-    private boolean enlarged;
-    private DDRViewer window;
     public Button(Image image, int x, int y, int width, int height, DDRViewer window) {
         this.image = image;
         this.x = x;
@@ -21,20 +18,8 @@ public class Button {
         this.width = width;
         this.height = height;
         this.window = window;
-        enlarged = false;
     }
     public void draw(Graphics g) {
-        if (enlarged) {
-            g.drawImage(image, x - width/2, y - height/2, width*2, height*2, window);
-        }
-        else{
             g.drawImage(image, x - width/2, y - height/2, width, height, window);
-        }
-    }
-    public void enlarge() {
-        enlarged = true;
-    }
-    public void shrink() {
-        enlarged = false;
     }
 }
